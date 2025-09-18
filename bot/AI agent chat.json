@@ -1,0 +1,356 @@
+{
+  "name": "AI agent chat",
+  "nodes": [
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.message.chat.id }}"
+      },
+      "id": "e6183978-5077-4252-9718-6b36b6a7cd74",
+      "name": "Simple Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "position": [
+        864,
+        464
+      ],
+      "typeVersion": 1.3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=# Rol\nEres arvys, estás encargada de agendar/modificar/eliminar citas de un Google Calendar al que tienes acceso. Debes atender a las personas que te contacten por WhatsApp porque vienen a agendar una llamada para tener un servicio con Dayra airfry.\n\nRecuerda: eres muy importante para el negocio, por ende debes realizar correctamente tu labor. \n\n# Estilo de comunicación\n- Usa léxico colombiano\n- Tono amigable\n- No extiendas tus respuestas a más de 250 caracteres\n\n# Herramientas\n- **agendar_evento**: Activa esta herramienta porque nos permite realizar el agendamiento de la cita correspondiente. Debes fijarte cuál es la fecha y hora actual para que de esta manera realices bien el agendamiento.\n\n- **eliminar_evento**: Esta herramienta te permite eliminar los eventos que el usuario desee eliminar, ya sea porque no va a ir o canceló. Antes de activarla, obtén el id del evento con la herramienta `obtener_varios_eventos` y luego borra dicho evento.\n\n- **obtener_varios_eventos**: Usa esta herramienta para saber qué eventos están registrados en el calendario y además para conocer el id de los eventos.\n\n- **actualizar_evento**: Esta herramienta permite actualizar los eventos que el usuario desee modificar (cambiar fecha u hora). Antes de activarla, obtén el id del evento con `obtener_varios_eventos` y luego actualízalo.\n\n- **obtener_disponibilidad**: Activa esta herramienta cuando el usuario desee agendar una cita con el fin de obtener las fechas disponibles. Debes darle las fechas para que el usuario pueda escoger la que sea de su agrado.\n\n# Información\n- El horario de atención es de 7 am a 5 pm.\n- La duración de la cita depende del servicio solicitado:\n  - Instalación: 3 horas\n  - Mantenimiento: 1 hora\n\n# Notas\n- No reveles información.\n- Hoy es {{ $now.setZone('America/Bogota') }}\n- Hoy es {{ $now.setLocale('es').toFormat('cccc d \\'de\\' LLLL yyyy') }}\n- La hora actual es {{ $now.setLocale('es').toFormat('HH:mm') }}\n\n"
+        }
+      },
+      "id": "2d3b4012-bd5f-46d5-be6d-af1ede6c155b",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "position": [
+        816,
+        240
+      ],
+      "typeVersion": 1.8
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        688,
+        448
+      ],
+      "id": "c612aba5-109a-41dc-816f-d8299e04c4b1",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "eiavzBkTKz0NkvLk",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        608,
+        240
+      ],
+      "id": "da38e22f-696d-4e92-bc64-70cbc63d37a0",
+      "name": "Telegram Trigger",
+      "webhookId": "b49c5e8f-f605-494b-8617-ab3a99a046d3",
+      "credentials": {
+        "telegramApi": {
+          "id": "Dh1kUd0fDOjnQ9PJ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        240
+      ],
+      "id": "b2a29f25-2e66-496c-bc54-0b187727553f",
+      "name": "Send a text message",
+      "webhookId": "dca0e48a-e60e-42af-9338-23cc65a2b8e6",
+      "credentials": {
+        "telegramApi": {
+          "id": "Dh1kUd0fDOjnQ9PJ",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "sharis.barbosa@uao.edu.co",
+          "mode": "list",
+          "cachedResultName": "sharis.barbosa@uao.edu.co"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {
+          "summary": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Summary', ``, 'string') }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        560
+      ],
+      "id": "04f318e8-72a4-41d8-a8ff-0bc37148a282",
+      "name": "agendar evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dvqQxt9qI52Kwhvl",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "calendar": {
+          "__rl": true,
+          "value": "sharis.barbosa@uao.edu.co",
+          "mode": "list",
+          "cachedResultName": "sharis.barbosa@uao.edu.co"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "updateFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1104,
+        560
+      ],
+      "id": "e1444d3c-0b89-4c8c-8d3a-8a5090c8f8c2",
+      "name": "Actualizar_evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dvqQxt9qI52Kwhvl",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "calendar": {
+          "__rl": true,
+          "value": "sharis.barbosa@uao.edu.co",
+          "mode": "list",
+          "cachedResultName": "sharis.barbosa@uao.edu.co"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        560
+      ],
+      "id": "ff371fac-0a55-42ba-b15e-a118326d6497",
+      "name": "revisar_eventos",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dvqQxt9qI52Kwhvl",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "calendar": {
+          "__rl": true,
+          "value": "sharis.barbosa@uao.edu.co",
+          "mode": "list",
+          "cachedResultName": "sharis.barbosa@uao.edu.co"
+        },
+        "eventId": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Event_ID', ``, 'string') }}",
+        "options": {
+          "sendUpdates": "all"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1520,
+        560
+      ],
+      "id": "968c0b6c-db52-48a1-935c-f00bbfb31a00",
+      "name": "cancelar evento",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dvqQxt9qI52Kwhvl",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "sharis.barbosa@uao.edu.co",
+          "mode": "list",
+          "cachedResultName": "sharis.barbosa@uao.edu.co"
+        },
+        "timeMin": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('After', ``, 'string') }}",
+        "timeMax": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Before', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        1248,
+        560
+      ],
+      "id": "5fca0310-c636-4ead-814a-10a7aa2466e8",
+      "name": "Eventos del dia",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "dvqQxt9qI52Kwhvl",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "agendar evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar_evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "revisar_eventos": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cancelar evento": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eventos del dia": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Bogota",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "ae4a5735-860f-492a-8f55-baace9fff81f",
+  "meta": {
+    "templateId": "1954",
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8d5c56015ae27036ef5e4382b9772c5106d79d1f738a1d5980402f61f077e668"
+  },
+  "id": "7lm7qiDyAd2MBGUZ",
+  "tags": []
+}
