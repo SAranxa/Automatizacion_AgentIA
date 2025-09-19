@@ -12,6 +12,8 @@ services:
       - n8n-network
     volumes:
       - n8n_data:/home/node/.n8n
+    depends_on:
+      - grpc_checker
 
   ngrok:
     container_name: ngrok
@@ -27,6 +29,19 @@ services:
       - n8n-network
     volumes:
       - ./ngrok.yml:/etc/ngrok.yml
+
+  grpc_checker:
+    container_name: grpc_checker
+    build:
+      context: ../grpc_service
+      dockerfile: Dockerfile
+    networks:
+      - n8n-network
+    volumes:
+      - ../credentials:/app/credentials:ro
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/credentials/google_credentials.json
+    restart: always
 
 volumes:
   n8n_data:

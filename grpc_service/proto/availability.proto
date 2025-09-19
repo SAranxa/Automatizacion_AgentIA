@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package availability;
+
+// The service definition.
+service Availability {
+  // Checks if a time slot is available.
+  rpc CheckAvailability (AvailabilityRequest) returns (AvailabilityResponse) {}
+}
+
+// The request message containing the start and end time.
+message AvailabilityRequest {
+  string start_time = 1; // ISO 8601 format
+  string end_time = 2;   // ISO 8601 format
+  string calendar_id = 3; // The ID of the calendar to check
+}
+
+// The response message containing the availability status.
+message AvailabilityResponse {
+  bool is_available = 1;
+}
