@@ -65,6 +65,35 @@ http://TU_IP_VPS:5678
 
 ----
 
+### 7. Obtener credenciales y API keys
+#### Telegram
+1. Abre la app de Telegram (móvil o desktop).
+2. Busca y abre @BotFather (cuenta oficial). 
+Telegram
+3. Envía el comando /newbot y sigue los pasos:
+   - Elige un nombre para el bot (visible).
+   - Elige un username único que termine en bot (ej. MiAgendaBot).
+4. Al terminar, BotFather te devolverá el Bot Token (una cadena 12345:ABC...) — cópialo. Ese token es la credencial que usarás en n8n (nodo Telegram) o en tus servicios para llamar al Bot API.
+#### Gemini
+Google ofrece acceso a Gemini a través de Google AI Studio / Generative AI APIs; para usar Gemini necesitas un API key desde Google AI Studio o Google Cloud según la configuración. Pasos generales: 
+Google AI for Developers
+1. Entra a Google AI Studio (o a la consola de Google Cloud si usas Vertex/Generative AI).
+2. Si aún no lo hiciste, acepta términos y activa el producto (puede pedir billing). 
+3. Busca la sección API keys o “Credentials / API keys” (en AI Studio o Google Cloud → API & Services → Credentials).
+4. Crea una nueva API key. Guarda la clave (string). Puedes limitar su uso por referrer, IP o servicios (recomendado). 
+Google AI for Developers
+5. Usa el API key en llamadas al SDK/HTTP (por ejemplo el SDK google-genai o petición HTTP con Authorization: Bearer <API_KEY> o parámetro key= según la API). Revisa la guía rápida / quickstart del SDK para ejemplos.
+
+#### Google Calendar 
+1. Ve a console.cloud.google.com y crea/selecciona un proyecto (p.ej. agenda-n8n).
+2. Habilita la API: APIs & Services → Library → Google Calendar API → Enable.
+3. Ve a APIs & Services → Credentials → Create Credentials → OAuth client ID.
+   - Si no configuraste el consentimiento, te pedirá configurar el OAuth consent screen (datos de app, scopes solicitados - pide https://www.googleapis.com/auth/calendar o el scope mínimo que uses).
+4. Crea un OAuth Client:
+   - Tipo: Web application (si tu n8n usa redirect URIs) o Other según caso.
+   - Añade Authorized redirect URIs (por ejemplo https://tu-dominio.com/oauth2callback o la URL que n8n requiera).
+5. Al crear obtendrás Client ID y Client Secret.
+
 ## Tablero Kanban
 Consulta el flujo de trabajo aquí:  
 [GitHub Projects – Kanban](https://github.com/users/SAranxa/projects/4)
