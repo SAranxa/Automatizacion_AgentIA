@@ -23,11 +23,6 @@ Está pensado para equipos que gestionan reservas de manera frecuente (servicios
 - Orquestación de acciones sobre un sistema de calendario.
 - Configuración de reglas de negocio (horarios, duraciones, políticas).
 
-**Fuera de alcance (por diseño)**
-- Sustituir un CRM completo o facturación.
-- Gestión avanzada de inventario/recursos más allá del calendario.
-- Reportería analítica avanzada (se puede integrar externamente).
-
 ## Instalación y Ejecución
 
 ### 1. Clonar el repositorio
@@ -35,6 +30,7 @@ Está pensado para equipos que gestionan reservas de manera frecuente (servicios
 git clone https://github.com/SAranxa/Automatizacion_AgentIA.git
 ```
 ### 2. Requisitos previos
+- VPS (Hostinger, DigitalOcean, HostGator)
 - Docker y Docker Compose instalados
 - Cuenta de Telegram Bot API configurada.
 - Cuenta de Google Calendar API con credenciales OAuth.
@@ -43,18 +39,25 @@ git clone https://github.com/SAranxa/Automatizacion_AgentIA.git
 ### 3. Configuración de variables de entorno
 Crea un archivo .env en la raíz del proyecto con lo siguiente:
 ```bash
-# Puerto donde corre n8n
+N8N_BASIC_AUTH_ACTIVE=true
+N8N_BASIC_AUTH_USER=admin
+N8N_BASIC_AUTH_PASSWORD=tu_password_segura
+N8N_HOST=tu-dominio.com
 N8N_PORT=5678
-
-# URL de ngrok (se actualiza en cada reinicio)
-WEBHOOK_TUNNEL_URL=https://<tu-subdominio-ngrok>.ngrok-free.app
 ```
 ### 4. Levantar el entorno con Docker Compose
 ```bash
 docker-compose up
 ```
 Esto descargará las imágenes necesarias y levantará el contenedor con n8n.
-### 5. Importar el flujo n8n
+
+### 5. Acceder a n8n
+Abre en tu navegador:
+```bash
+http://TU_IP_VPS:5678
+```
+----
+### 6. Importar el flujo n8n
 - Inicia sesión en n8n
 - Importa el archivo JSON del flujo (AI agent chat.json).
 - Reemplaza los IDs de credenciales por los tuyos.
